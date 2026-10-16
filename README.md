@@ -14,6 +14,12 @@ The invoice being edited (header, rates and line items) is saved on this
 device with `shared_preferences` and restored on launch; "Start a new
 invoice" clears it. There is no account, backend, analytics or network access.
 
+## Status
+
+Mobile release candidate (build-out decided 2026-10-16; see
+[PRODUCT.md](PRODUCT.md#rc-decision-2026-10-16-boo-215)). Not store-released and
+not yet verified on a device.
+
 ## Tech Stack
 
 - **Framework:** Flutter (CI pinned to 3.47.5) + Material 3
