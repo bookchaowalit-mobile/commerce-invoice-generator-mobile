@@ -11,8 +11,9 @@ const String sentryDsn = String.fromEnvironment('SENTRY_DSN');
 bool crashReportingEnabled(String dsn) => dsn.trim().isNotEmpty;
 
 /// Errors only, scrubbed: no default PII, no tracing or sessions, no
-/// breadcrumbs, screenshots or view hierarchy. Native crash and ANR capture is
-/// off so every event passes through [scrubEvent].
+/// breadcrumbs, screenshots or view hierarchy (off by default and
+/// experimental in sentry_flutter 9.x, so it is not set here). Native crash
+/// and ANR capture is off so every event passes through [scrubEvent].
 void configureCrashReporting(SentryFlutterOptions options,
     {required String dsn}) {
   options
@@ -26,7 +27,6 @@ void configureCrashReporting(SentryFlutterOptions options,
     ..enableNativeCrashHandling = false
     ..anrEnabled = false
     ..attachScreenshot = false
-    ..attachViewHierarchy = false
     ..enableUserInteractionBreadcrumbs = false
     ..enableAutoNativeBreadcrumbs = false
     ..enablePrintBreadcrumbs = false

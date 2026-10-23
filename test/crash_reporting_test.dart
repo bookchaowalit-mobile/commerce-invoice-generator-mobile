@@ -26,6 +26,7 @@ void main() {
       expect(options.tracesSampleRate, isNull);
       expect(options.tracesSampler, isNull);
       expect(options.attachScreenshot, isFalse);
+      // ignore: experimental_member_use
       expect(options.attachViewHierarchy, isFalse);
       expect(options.beforeSend, isNotNull);
       expect(options.beforeBreadcrumb, isNotNull);
