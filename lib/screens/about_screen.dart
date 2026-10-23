@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 class AboutScreen extends StatelessWidget {
-  const AboutScreen({super.key});
+  const AboutScreen({super.key, this.crashReporting = false});
+
+  /// True when this build sends crash reports (see crash_reporting.dart).
+  final bool crashReporting;
 
   @override
   Widget build(BuildContext context) {
@@ -26,10 +29,16 @@ class AboutScreen extends StatelessWidget {
           const SizedBox(height: 16),
           Text('Privacy', style: textTheme.titleMedium),
           const SizedBox(height: 8),
-          const Text(
-            'Everything runs on this device. The app has no account, '
-            'analytics or network calls. The invoice you are editing is '
-            'saved locally on this device.',
+          Text(
+            crashReporting
+                ? 'Everything runs on this device. The app has no account or '
+                    'analytics. If it crashes, it sends a crash report to Sentry '
+                    'with the error type and where in the code it happened, '
+                    'never your invoice or personal details. The invoice you are '
+                    'editing is saved locally on this device.'
+                : 'Everything runs on this device. The app has no account, '
+                    'analytics or network calls. The invoice you are editing is '
+                    'saved locally on this device.',
           ),
           const SizedBox(height: 16),
           Text('Made by Chaowalit Greepoke · bookchaowalit.com',

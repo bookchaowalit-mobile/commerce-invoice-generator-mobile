@@ -1,15 +1,27 @@
 import 'package:flutter/material.dart';
 
+import 'package:sentry_flutter/sentry_flutter.dart';
+
 import 'data/draft_repository.dart';
+import 'observability/crash_reporting.dart';
 import 'screens/about_screen.dart';
 import 'screens/home_screen.dart';
 
-void main() {
-  runApp(const InvoiceGeneratorApp());
+Future<void> main() async {
+  if (!crashReportingEnabled(sentryDsn)) {
+    runApp(const InvoiceGeneratorApp());
+    return;
+  }
+  await SentryFlutter.init(
+    (options) => configureCrashReporting(options, dsn: sentryDsn),
+    appRunner: () => runApp(const InvoiceGeneratorApp(crashReporting: true)),
+  );
 }
 
 class InvoiceGeneratorApp extends StatelessWidget {
-  const InvoiceGeneratorApp({super.key});
+  const InvoiceGeneratorApp({super.key, this.crashReporting = false});
+
+  final bool crashReporting;
 
   @override
   Widget build(BuildContext context) {
@@ -26,13 +38,15 @@ class InvoiceGeneratorApp extends StatelessWidget {
         useMaterial3: true,
         brightness: Brightness.dark,
       ),
-      home: const MainShell(),
+      home: MainShell(crashReporting: crashReporting),
     );
   }
 }
 
 class MainShell extends StatefulWidget {
-  const MainShell({super.key});
+  const MainShell({super.key, this.crashReporting = false});
+
+  final bool crashReporting;
 
   @override
   State<MainShell> createState() => _MainShellState();
@@ -46,9 +60,9 @@ class _MainShellState extends State<MainShell> {
     return Scaffold(
       body: IndexedStack(
         index: _index,
-        children: const [
-          HomeScreen(repository: deviceDraftRepository),
-          AboutScreen(),
+        children: [
+          const HomeScreen(repository: deviceDraftRepository),
+          AboutScreen(crashReporting: widget.crashReporting),
         ],
       ),
       bottomNavigationBar: NavigationBar(
