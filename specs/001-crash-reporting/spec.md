@@ -3,7 +3,8 @@
 | Field | Value |
 |---|---|
 | Status | implemented on `main` (2026-10-23) |
-| Commits | `7d379d6` (CI), `67907b0` (Sentry), `11d6954` (docs) |
+| Commits | `7d379d6` (CI), `67907b0` (Sentry), `11d6954` (docs), `6395bb8` (sentry_flutter 9.30.1) |
+| CI evidence | run 39907615105 on `6395bb8`: all jobs green, artifact `invoice-generator-android-6395bb8…` uploaded |
 | Owner / AI maker | bookchaowalit / Claude Code (b-tier-b) |
 | Related | [PRODUCT.md](../../PRODUCT.md), [KPI plan](../../docs/measurement/KPI-PLAN.md) |
 
@@ -64,6 +65,12 @@ dummy DSN, `example.invalid`, so nothing was sent) at 375, 768 and 1440 px wide,
 
 Screenshots: `~/work/b-tier-b/shots/commerce-invoice-generator-mobile-sentry/` (owner machine). Signed off by
 Claude Code (AI reviewer), 2026-10-23. Not yet run on an Android device or emulator.
+
+## Dependency note
+
+`sentry_flutter` 10.x declares Android minSdk 26 and broke the manifest merge (app minSdk 24, run 39906161126).
+Pinned to `^9.30.1` (minSdk 21) so the supported device range is unchanged; same choice as
+`productivity-habit-tracker-mobile`. Moving to 10.x needs a decision to drop Android 7.x.
 
 ## Out of scope
 
