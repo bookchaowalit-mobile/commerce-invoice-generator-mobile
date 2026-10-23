@@ -12,7 +12,12 @@ Part of [Chaowalit Greepoke](https://bookchaowalit.com)'s 101 Portfolio Projects
 
 The invoice being edited (header, rates and line items) is saved on this
 device with `shared_preferences` and restored on launch; "Start a new
-invoice" clears it. There is no account, backend, analytics or network access.
+invoice" clears it. There is no account, backend or analytics.
+
+Crash reporting (Sentry, errors only, scrubbed of user data and exception
+messages) is compiled in only when the build passes
+`--dart-define=SENTRY_DSN=...`, which only the CI release bundle does. Every
+other build makes no network calls. See `lib/observability/crash_reporting.dart`.
 
 ## Status
 
@@ -39,8 +44,11 @@ flutter test
 flutter run
 ```
 
-CI (`.github/workflows/build.yml`) runs the same format/analyze/test checks
-and fails closed; a debug APK is built on pushes to `main`.
+CI (`.github/workflows/build.yml`) runs the same format/analyze/test checks,
+checks that an unsigned release build still fails, and runs the shared
+security scan (gitleaks, Semgrep, OSV-Scanner, Trivy). On pushes to `main` it
+uploads a workflow artifact with a debug APK and an **unsigned** release app
+bundle (SHA-256 in the run summary). The unsigned bundle is not for any store.
 
 ## Build
 
@@ -50,7 +58,9 @@ flutter build apk --debug
 ```
 
 Release builds (`flutter build apk --release` / `appbundle`) fail on purpose
-until signing is configured; they never fall back to the debug key. To sign,
+until signing is configured; they never fall back to the debug key. CI alone
+sets the Gradle property `allowUnsignedRelease=true` to produce an unsigned
+bundle for inspection; that bundle cannot be installed or uploaded. To sign,
 create an upload keystore outside the repo and add the ignored
 `android/key.properties`:
 
@@ -65,7 +75,7 @@ Never commit `key.properties` or keystores (both are git-ignored).
 
 ## Related
 
-- **Frontend:** [bookchaowalit-website/invoice-generator-frontend](https://github.com/bookchaowalit-website/invoice-generator-frontend)
+- **Frontend:** [bookchaowalit-website/commerce-invoice-generator-web](https://github.com/bookchaowalit-website/commerce-invoice-generator-web)
 - **Portfolio:** [bookchaowalit.com](https://bookchaowalit.com)
 
 ## License
