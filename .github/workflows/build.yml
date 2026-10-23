@@ -26,7 +26,7 @@ jobs:
           channel: 'stable'
           cache: true
       - name: Resolve dependencies
-        run: flutter pub get
+        run: flutter pub get --enforce-lockfile
       - name: Check formatting
         run: dart format --output=none --set-exit-if-changed lib test
       - name: Analyze
@@ -34,9 +34,21 @@ jobs:
       - name: Test
         run: flutter test
 
-  build-android-debug:
-    name: Debug APK (main only)
-    needs: validate
+      - name: Verify Android release signing fails closed without credentials
+        run: |
+          if flutter build appbundle --release >release-gate.log 2>&1; then
+            echo "Unsigned release unexpectedly succeeded"
+            exit 1
+          fi
+          grep -q "Release signing is not configured" release-gate.log
+
+  # Shared security scan: gitleaks, Semgrep, OSV-Scanner (pubspec.lock), Trivy.
+  security:
+    uses: bookchaowalit/platform-ci-workflows/.github/workflows/security.yml@87dc5e1c7e0416886a6371d5a101bb2ccba38edd # v1.1.1
+
+  build-android:
+    name: Android builds (main only)
+    needs: [validate, security]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
@@ -46,6 +58,38 @@ jobs:
           flutter-version: '3.47.5'
           channel: 'stable'
           cache: true
-      - run: flutter pub get
-      - name: Build debug APK
+      - run: flutter pub get --enforce-lockfile
+
+      - name: Build debug APK (installable, for device and Maestro checks)
         run: flutter build apk --debug
+
+      # Release mode, but deliberately UNSIGNED: there is no upload keystore in CI, and the
+      # Gradle guard still refuses any release build unless allowUnsignedRelease is set.
+      # This bundle cannot be installed or uploaded to Play until it is signed. Not for store.
+      - name: Build unsigned release app bundle (CI only, not for store)
+        env:
+          ORG_GRADLE_PROJECT_allowUnsignedRelease: 'true'
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+        run: flutter build appbundle --release --dart-define=SENTRY_DSN="$SENTRY_DSN"
+
+      - name: Rename outputs and record SHA-256
+        run: |
+          mkdir -p dist
+          cp build/app/outputs/flutter-apk/app-debug.apk dist/invoice-generator-debug.apk
+          cp build/app/outputs/bundle/release/app-release.aab dist/invoice-generator-release-UNSIGNED-not-for-store.aab
+          {
+            echo "### Android build artifacts (${GITHUB_SHA})"
+            echo
+            echo "The release bundle is unsigned and cannot be installed or uploaded until it is signed."
+            echo
+            echo '```text'
+            (cd dist && sha256sum *)
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: invoice-generator-android-${{ github.sha }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30

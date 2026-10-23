@@ -55,6 +55,13 @@ android {
     }
 }
 
+// CI-only escape hatch: `-PallowUnsignedRelease=true` (or the env var
+// ORG_GRADLE_PROJECT_allowUnsignedRelease=true) lets a release build finish
+// WITHOUT any signing config, producing an unsigned bundle that cannot be
+// installed or uploaded. It never signs with the debug key. Without the flag,
+// release builds still fail closed below.
+val allowUnsignedRelease = providers.gradleProperty("allowUnsignedRelease").orNull == "true"
+
 gradle.taskGraph.whenReady {
     val requestsRelease = allTasks.any {
         it.name.contains("release", ignoreCase = true) &&
@@ -62,7 +69,7 @@ gradle.taskGraph.whenReady {
                 it.name.contains("assemble", ignoreCase = true) ||
                 it.name.contains("package", ignoreCase = true))
     }
-    if (requestsRelease && !keystorePropertiesFile.exists()) {
+    if (requestsRelease && !keystorePropertiesFile.exists() && !allowUnsignedRelease) {
         throw GradleException(
             "Release signing is not configured. Provide ignored android/key.properties and an upload keystore.",
         )
