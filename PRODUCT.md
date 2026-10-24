@@ -30,8 +30,9 @@ offline-first Flutter app with tested money arithmetic, not a billing system.
 - One invoice at a time: no saved invoice list, clients or numbering history.
 - No account, backend, sync or analytics.
 - Not run on a real device or emulator for this version; no Maestro flow yet.
-- Not in any store. The CI release bundle is **unsigned** (no upload keystore exists yet) and cannot be installed or
-  uploaded; the installable CI build is the debug APK.
+- Not in any store. The CI release bundle is **unsigned** and cannot be installed or uploaded; the installable CI
+  build is the debug APK. An upload keystore exists in Infisical since 2026-10-24 (`docs/RELEASE-SIGNING.md`) but CI
+  does not use it yet.
 
 ## Where it runs
 
@@ -49,7 +50,7 @@ tests in fail-closed CI. Recorded in the RC gate audit
 (`bookchaowalit/knowledge-base:archive/repository-catalog-audits/BOOK-DEV-MOBILE-RC-GATE-2026-08-11.md`).
 
 Still open before any release claim: a device or emulator run, PDF or
-share-sheet export, an upload keystore, and store publication.
+share-sheet export, signing in CI with the stored upload key, and store publication.
 
 ## Measurement and specs
 

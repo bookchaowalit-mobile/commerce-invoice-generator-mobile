@@ -72,6 +72,8 @@ storeFile=/absolute/path/to/upload-keystore.jks
 ```
 
 Never commit `key.properties` or keystores (both are git-ignored).
+The upload keystore and passwords are in Infisical `/android`; see
+[docs/RELEASE-SIGNING.md](docs/RELEASE-SIGNING.md).
 
 ## Related
 
