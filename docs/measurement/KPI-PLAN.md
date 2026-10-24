@@ -1,6 +1,6 @@
 ---
 title: "Invoice Generator Mobile — KPI and Instrumentation Plan"
-status: draft
+status: approved
 created: 2026-10-22
 updated: 2026-10-23
 description: "How Invoice Generator Mobile would be measured once it has users; today only Sentry error reports exist."
@@ -14,10 +14,10 @@ template: architecture-docs templates/sdlc/kpi-and-instrumentation-plan.md
 | Field | Value |
 |---|---|
 | Project / product | bookchaowalit-mobile/commerce-invoice-generator-mobile (no live URL; not store-released) |
-| Version / status | 0.1 / **draft** — definitions only; no analytics is live, no baselines |
+| Version / status | 0.1 / **approved** (2026-10-24) — definitions only; no analytics is live, no baselines |
 | Metric owner | Owner (bookchaowalit) |
 | AI maker | Claude Code (b-tier-b session, 2026-10-22) |
-| AI reviewer | not yet reviewed |
+| AI reviewer | independent Claude reviewer subagent (`solo:solo-reviewer`, Sonnet, read-only, no maker context), 2026-10-24: approved (see Approval) |
 | Charter objective | OBJ-01 below (portfolio RC; no charter document) |
 | Analytics source of truth | none yet. Product analytics: owner decision **D4** (2026-10-23) chose the PostHog free tier, but no PostHog project or key exists yet, so nothing is sent. The only live signal is Sentry (org `personal-yu0`, project `commerce-invoice-generator-mobile`), errors only, and only from the CI release bundle, which is unsigned and not distributed |
 | Dashboard | none |
@@ -88,3 +88,12 @@ Privacy rules:
 |---|---|---|---|---|
 | 2026-10-22 | all | first draft | b-tier-b L3 work | pending owner |
 | 2026-10-23 | all | D4 recorded as PostHog free tier (no key yet) | owner decision D4 | pending owner |
+
+## Approval (2026-10-24)
+
+| Field | Value |
+|---|---|
+| Checker | independent Claude reviewer subagent (`solo:solo-reviewer`, Sonnet, read-only, no maker context) |
+| Approver | AI approval under the owner's process (approvals by the owner or AI with evidence; maker and checker are different agents). Recorded by Claude session oa-remainder on the owner's instruction "ทำที่เหลือให้หน่อย" (2026-10-24) |
+| Verdict | **approved** |
+| Evidence | lib/observability/crash_reporting.dart (scrubEvent, sendDefaultPii false) + test; build.yml SENTRY_DSN; about_screen says no analytics; no event code. |
